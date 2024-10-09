@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfer Dana</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <img src="bca_logo.png" alt="BCA Logo">
+            </div>
+            <div class="header-right">
+                <span>[LOGOUT]</span>
+            </div>
+        </div>
+
+        <div class="date-info">
+            Tanggal : 26/06/2014 Jam : 08:31:17
+        </div>
+
+        <div class="content-wrapper">
+            <div class="sidebar">
+                <ul>
+                    <li>Transfer Dana</li>
+                    <ul>
+                        <li>Daftar Rekening Tujuan</li>
+                        <li>Transfer ke Rek. BCA</li>
+                        <li>Transfer ke BCA Virtual Account</li>
+                        <li>Transfer ke Rek. Bank lain Dalam Negeri</li>
+                    </ul>
+                    <li>Kembali ke Menu Utama</li>
+                </ul>
+            </div>
+
+            <div class="main-content">
+                <div class="transfer-section">
+                    <h2>TRANSFER DANA - TRANSFER KE REK. BCA</h2>
+                    <form>
+                        <table class="form-table">
+                            <tr>
+                                <td>DARI REKENING</td>
+                                <td>:</td>
+                                <td><input type="text" value="******" readonly></td>
+                            </tr>
+                            <tr>
+                                <td>SILAKAN PILIH REKENING TUJUAN</td>
+                                <td>:</td>
+                                <td>
+                                    <input type="radio" name="rekening_tujuan" value="sendiri"> REKENING SENDIRI<br>
+                                    <input type="radio" name="rekening_tujuan" value="daftar" checked> DARI DAFTAR TRANSFER
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>NAMA TUJUAN</td>
+                                <td>:</td>
+                                <td>
+                                    <select>
+                                        <option value="2106017899">2106017899 - TOMMIE HARYANTO</option>
+                                        <!-- Add more options as needed -->
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>JUMLAH</td>
+                                <td>:</td>
+                                <td>Rp.<input type="text" value="87897"></td>
+                            </tr>
+                            <tr>
+                                <td>BERITA</td>
+                                <td>:</td>
+                                <td>
+                                    <input type="text" value="Pembayaran Domain"><br>
+                                    <input type="text" value="Tagihan #763235">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>MASUKKAN 8 ANGKA INI PADA KEYBCA</td>
+                                <td>:</td>
+                                <td><input type="text" value="77017899"></td>
+                            </tr>
+                            <tr>
+                                <td>PASTIKAN 6 ANGKA TERAKHIR SESUAI DENGAN NOMOR REKENING TUJUAN ANDA</td>
+                                <td>:</td>
+                                <td><input type="text" value="017899"></td>
+                            </tr>
+                            <tr>
+                                <td>RESPON KEYBCA APPLI 2</td>
+                                <td>:</td>
+                                <td><input type="password"></td>
+                            </tr>
+                        </table>
+
+                        <div class="submit-section">
+                            <label for="jenis-transfer">JENIS TRANSFER</label><br>
+                            <input type="radio" name="jenis_transfer" value="sekarang" checked> TRANSFER SEKARANG
+                        </div>
+                        
+                        <div class="button-section">
+                            <button type="submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Copyright © 2000 BCA All Rights Reserved</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internet Banking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <img src="bca_logo.png" alt="BCA Logo">
+            </div>
+            <div class="header-right">
+                <span>[LOGOUT]</span>
+            </div>
+        </div>
+
+        <div class="date-info">
+            Tanggal : 25/06/2014 Jam : 15:23:09
+        </div>
+
+        <div class="content-wrapper">
+            <div class="sidebar">
+                <ul>
+                    <li>Pembelian</li>
+                    <li>Pembayaran</li>
+                    <li>Pembayaran e-Commerce</li>
+                    <li><a href="{{ url_for('transfer') }}">Transfer Dana</a></li>
+                    <li><a href="{{ url_for('saldo', customer_id=1) }}">Informasi Rekening</a></li>
+                    <li>Informasi Kartu Kredit</li>
+                    <li>Informasi Kredit Konsumer</li>
+                    <li>Informasi Produk Investasi</li>
+                    <li>Informasi Lainnya</li>
+                    <li>Status Transaksi</li>
+                    <li>Histori Transaksi</li>
+                    <li>Administrasi</li>
+                    <li>E-Mail</li>
+                </ul>
+            </div>
+
+            <div class="main-content">
+                <div class="welcome-message">
+                    <p>Login Terakhir Anda tanggal : 25/06/2014 15:21:00</p>
+                    <h1>HANAFI, Selamat Datang Di Internet Banking BCA</h1>
+                    <p class="highlight-text">
+                        UNTUK MENINGKATKAN KEAMANAN TRANSAKSI <br>
+                        MOHON SEGERA DAFTARKAN NO HANDPHONE ANDA <br>
+                        MELALUI ATM ATAU CABANG BCA TERDEKAT
+                    </p>
+                    <p class="small-text">
+                        MOHON PASTIKAN NOMOR HANDPHONE YANG DIDAFARKAN ADALAH MILIK ANDA <br>
+                        DAN TERKINI, AGAR KAMI DAPAT MENGIRIMKAN SMS KE NOMOR TERSEBUT
+                    </p>
+                    <p class="contact-info">
+                        UNTUK INFO LEBIH LANJUT <br>
+                        HUBUNGI HALO BCA DI 500888 ATAU (021) 500888 DARI PONSEL
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Copyright © 2000 BCA All Rights Reserved</p>
+        </footer>
+    </div>
+</body>
+</html>
