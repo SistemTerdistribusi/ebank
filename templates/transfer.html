@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transfer Dana</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div class="header-left">
-                <img src="bca_logo.png" alt="BCA Logo">
+                <img src="{{ url_for('static', filename='/asset/bca logo.png') }}" alt="BCA Logo">
             </div>
             <div class="header-right">
                 <span>[LOGOUT]</span>

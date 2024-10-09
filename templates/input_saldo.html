@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Internet Banking</title>
+    <title>Input Saldo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -18,7 +18,7 @@
         </div>
 
         <div class="date-info">
-            
+            Tanggal : 26/06/2014 Jam : 08:31:17
         </div>
 
         <div class="content-wrapper">
@@ -41,22 +41,27 @@
             </div>
 
             <div class="main-content">
-                <div class="welcome-message">
-                    <p>Login Terakhir Anda tanggal : 25/06/2014 15:21:00</p>
-                    <h1>HANAFI, Selamat Datang Di Internet Banking BCA</h1>
-                    <p class="highlight-text">
-                        UNTUK MENINGKATKAN KEAMANAN TRANSAKSI <br>
-                        MOHON SEGERA DAFTARKAN NO HANDPHONE ANDA <br>
-                        MELALUI ATM ATAU CABANG BCA TERDEKAT
-                    </p>
-                    <p class="small-text">
-                        MOHON PASTIKAN NOMOR HANDPHONE YANG DIDAFARKAN ADALAH MILIK ANDA <br>
-                        DAN TERKINI, AGAR KAMI DAPAT MENGIRIMKAN SMS KE NOMOR TERSEBUT
-                    </p>
-                    <p class="contact-info">
-                        UNTUK INFO LEBIH LANJUT <br>
-                        HUBUNGI HALO BCA DI 500888 ATAU (021) 500888 DARI PONSEL
-                    </p>
+                <div class="input-saldo-section">
+                    <h2>INPUT SALDO</h2>
+                    <form action="{{ url_for('input_saldo') }}" method="POST">
+                        <label for="account_number">No Rekening</label>
+                        <input type="text" id="account_number" name="account_number" required>
+                        <br>
+                        <label for="account_type">Tipe Akun</label>
+                        <input type="text" id="account_type" name="account_type" required>
+                        <br>
+                        <label for="currency_code">Mata Uang</label>
+                        <select id="currency_code" name="currency_code" required>
+                            <option value="IDR">IDR</option>
+                            <option value="USD">USD</option>
+                            <!-- Add other currencies as needed -->
+                        </select>
+                        <br>
+                        <label for="available_balance">Available Balance</label>
+                        <input type="number" id="available_balance" name="available_balance" required>
+                        <br>
+                        <button type="submit" action="{{ url_for('input_saldo') }}">Submit</button>
+                    </form>
                 </div>
             </div>
         </div>

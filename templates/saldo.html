@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Balance Inquiry</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div class="header-left">
-                <img src="bca_logo.png" alt="BCA Logo">
+                <img src="{{ url_for('static', filename='/asset/bca logo.png') }}" alt="BCA Logo">
             </div>
             <div class="header-right">
                 <span>[LOGOUT]</span>
@@ -20,7 +20,7 @@
         <div class="date-info">
             Date : 05/05/2020 Time : 16:15:37
         </div>
-
+        
         <div class="content-wrapper">
             <div class="sidebar">
                 <ul>
@@ -47,9 +47,9 @@
                     <table class="balance-table">
                         <thead>
                             <tr>
-                                <th>Account No.</th>
+                                <th>No. Rekening</th>
                                 <th>Account Type</th>
-                                <th>Currency</th>
+                                <th>Mata Uang</th>
                                 <th>Available Balance</th>
                             </tr>
                         </thead>

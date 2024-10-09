@@ -86,13 +86,11 @@ def login():
 
 # Home route
 @app.route('/home')
-@login_required
 def home():
     return render_template('index.html', customer=current_user)
 
 # Transfer route
 @app.route('/transfer', methods=['GET', 'POST'])
-@login_required
 def transfer():
     if request.method == 'POST':
         # Handle transfer logic here
@@ -107,14 +105,24 @@ def transfer():
 
 # Saldo route
 @app.route('/saldo')
-@login_required
 def saldo():
     # Add logic to retrieve and display the user's balance
     return render_template('saldo.html', customer=current_user)
 
+@app.route('/input_saldo')
+def input_saldo():
+    # no_rekening = request.form['no_rekening']
+    # type_akun = request.form['type_akun']
+    # mata_uang = request.form['mata_uang']
+    # available_balance = request.form['available_balance']
+    
+    # You can process and save this data as needed
+    # For example, saving to a database
+
+    return render_template('input_saldo.html')
+
 # Logout route
 @app.route('/logout')
-@login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
@@ -126,4 +134,4 @@ def index():
 
 # Run the app
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
