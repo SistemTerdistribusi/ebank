@@ -1,44 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Balance Inquiry</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="header-left">
-                <img src="{{ url_for('static', filename='/asset/bca logo.png') }}" alt="BCA Logo">
-            </div>
-            <div class="header-right">
-                <span>[LOGOUT]</span>
-            </div>
-        </div>
+{% extends 'base/base.html' %}
 
-        <div class="date-info">
-            Date : 05/05/2020 Time : 16:15:37
-        </div>
-        
-        <div class="content-wrapper">
-            <div class="sidebar">
-                <ul>
-                    <li>Account Information</li>
-                    <ul>
-                        <li>Balance Inquiry</li>
-                        <li>Account Statement</li>
-                        <li>Time Deposit</li>
-                        <li>Tahapan Berjangka</li>
-                        <li>Fund Account (RDN)</li>
-                        <ul>
-                            <li>Balance Inquiry RDN</li>
-                            <li>Fund Movement RDN</li>
-                        </ul>
-                    </ul>
-                    <li>Back to Main Menu</li>
-                </ul>
-            </div>
+
+{% block title %}Saldo | Bank{% endblock %}
+
+{% block content %}
 
             <div class="main-content">
                 <div class="balance-section">
@@ -54,21 +19,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1730100538</td>
-                                <td>Tabungan</td>
-                                <td>IDR</td>
-                                <td>14,630,520,011.57</td>
-                            </tr>
+                            {% for account in accounts %}
+                                <tr>
+                                    <td>{{ account.account_number }}</td>
+                                    <td>{{ account.account_type }}</td>
+                                    <td>{{ account.currency_code }}</td>
+                                    <td>{{ account.available_balance }}</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
 
-        <footer>
-            <p>Copyright © 2000 BCA All Rights Reserved</p>
-        </footer>
-    </div>
-</body>
-</html>
+
+
+{% endblock %}

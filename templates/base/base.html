@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bank{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <img src="{{ url_for('static', filename='/asset/bca logo.png') }}" alt="BCA Logo">
+            </div>
+            <div class="header-right">
+                <span>[LOGOUT]</span>
+            </div>
+        </div>
+
+        <div class="date-info">
+            Date : {{ current_date }} Time : {{ current_time }}
+        </div>
+
+        <div class="content-wrapper">
+            <div class="sidebar">
+                <ul>
+                    <li>Account Information</li>
+                    <ul>
+                    <li><a href="{{ url_for('transfer') }}">Transfer Dana</a></li>
+                    <li><a href="{{ url_for('saldo', customer_id=1) }}">Informasi Rekening</a></li>
+                    <li><a href="{{ url_for('input_saldo') }}">Input Saldo</a></li>
+                    <li><a href="{{ url_for('home') }}">Back to Main Menu</a></li>
+                </ul>
+            </div>
+
+            
+            {% block content %}{% endblock %}
+
+
+
+        </div>
+
+        <footer>
+            <p>Copyright ©  2024  BCA-KW All Rights Reserved</p>
+        </footer>
+    </div>
+</body>
+</html>

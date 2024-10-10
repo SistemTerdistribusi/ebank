@@ -1,39 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transfer Dana</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="header-left">
-                <img src="{{ url_for('static', filename='/asset/bca logo.png') }}" alt="BCA Logo">
-            </div>
-            <div class="header-right">
-                <span>[LOGOUT]</span>
-            </div>
-        </div>
+{% extends 'base/base.html' %}
 
-        <div class="date-info">
-            Tanggal : 26/06/2014 Jam : 08:31:17
-        </div>
 
-        <div class="content-wrapper">
-            <div class="sidebar">
-                <ul>
-                    <li>Transfer Dana</li>
-                    <ul>
-                        <li>Daftar Rekening Tujuan</li>
-                        <li>Transfer ke Rek. BCA</li>
-                        <li>Transfer ke BCA Virtual Account</li>
-                        <li>Transfer ke Rek. Bank lain Dalam Negeri</li>
-                    </ul>
-                    <li>Kembali ke Menu Utama</li>
-                </ul>
-            </div>
+{% block title %}Saldo | Bank{% endblock %}
+
+{% block content %}
 
             <div class="main-content">
                 <div class="transfer-section">
@@ -104,11 +74,4 @@
                     </form>
                 </div>
             </div>
-        </div>
-
-        <footer>
-            <p>Copyright © 2000 BCA All Rights Reserved</p>
-        </footer>
-    </div>
-</body>
-</html>
+            {% endblock %}

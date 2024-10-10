@@ -3,7 +3,18 @@ from flask_login import UserMixin
 
 db = SQLAlchemy()
 
-class Customer(db.Model, UserMixin):  # Inherit from UserMixin
+class PortfolioAccount(db.Model):
+    __tablename__ = 'm_portfolio_account'
+    
+    id = db.Column(db.BigInteger, primary_key=True, nullable=False)
+    m_customer_id = db.Column(db.BigInteger, db.ForeignKey('m_customer.id'))
+    account_number = db.Column(db.String(20), nullable=True)
+    account_name = db.Column(db.String(50), nullable=True)
+    available_balance = db.Column(db.Numeric(30, 5), nullable=True)
+    created = db.Column(db.DateTime, server_default=db.func.current_timestamp(), nullable=False)
+    updated = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp(), nullable=False)
+
+class Customer(db.Model):
     __tablename__ = 'm_customer'
     
     id = db.Column(db.BigInteger, primary_key=True, nullable=False)
@@ -17,19 +28,9 @@ class Customer(db.Model, UserMixin):  # Inherit from UserMixin
     last_login = db.Column(db.DateTime, nullable=True)
     created = db.Column(db.DateTime, server_default=db.func.current_timestamp(), nullable=False)
     updated = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp(), nullable=False)
+    
+    # Relationship with portfolio account
+    accounts = db.relationship('PortfolioAccount', backref='customer', lazy=True)
 
     def get_id(self):
         return self.id
-    
-    @property
-    def is_active(self):
-        # Assuming all customers are active. You can modify this logic as needed.
-        return True
-    
-    @property
-    def is_authenticated(self):
-        return True
-    
-    @property
-    def is_anonymous(self):
-        return False

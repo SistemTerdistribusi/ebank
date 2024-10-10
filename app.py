@@ -1,7 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import pytz
 
@@ -16,15 +14,18 @@ app.config['SECRET_KEY'] = 'wibunyel'
 # Initialize the database
 db = SQLAlchemy(app)
 
-# Initialize Flask-Login
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
+@app.context_processor
+def inject_current_datetime():
+    current_datetime = datetime.now(pytz.timezone('Asia/Jakarta'))
+    current_date = current_datetime.strftime('%d/%m/%Y')
+    current_time = current_datetime.strftime('%H:%M:%S')
+    return dict(current_date=current_date, current_time=current_time)
+
 
 # Define the Customer model
 class Customer(db.Model):
     __tablename__ = 'm_customer'
-    
+
     id = db.Column(db.BigInteger, primary_key=True, nullable=False)
     customer_name = db.Column(db.String(30), nullable=False)
     customer_username = db.Column(db.String(50), nullable=False, unique=True)
@@ -37,100 +38,79 @@ class Customer(db.Model):
     created = db.Column(db.DateTime, server_default=db.func.current_timestamp(), nullable=False)
     updated = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp(), nullable=False)
 
-    def get_id(self):
-        return self.id
+# Define the PortfolioAccount model
+class PortfolioAccount(db.Model):
+    __tablename__ = 'm_portfolio_account'
 
-# User loader callback
-@login_manager.user_loader
-def load_user(user_id):
-    return Customer.query.get(int(user_id))
+    id = db.Column(db.BigInteger, primary_key=True, nullable=False)
+    m_customer_id = db.Column(db.BigInteger, nullable=True)
+    account_number = db.Column(db.String(20), nullable=True)
+    account_status = db.Column(db.String(1), nullable=True)
+    account_name = db.Column(db.String(50), nullable=True)
+    account_type = db.Column(db.String(10), nullable=True)
+    product_code = db.Column(db.String(10), nullable=True)
+    product_name = db.Column(db.String(50), nullable=True)
+    currency_code = db.Column(db.String(3), nullable=True)
+    branch_code = db.Column(db.String(10), nullable=True)
+    plafond = db.Column(db.Numeric(30, 5), nullable=True)
+    clear_balance = db.Column(db.Numeric(30, 5), nullable=True)
+    available_balance = db.Column(db.Numeric(30, 5), nullable=True)
+    confidential = db.Column(db.String(1), nullable=True)
+    created = db.Column(db.DateTime, server_default=db.func.current_timestamp(), nullable=False)
+    created_by = db.Column(db.BigInteger, nullable=False, default=1)
+    updated = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp(), nullable=False)
+    updated_by = db.Column(db.BigInteger, nullable=False, default=1)
 
-# Initialize the database
-@app.route('/initdb')
-def initdb():
-    db.create_all()
+# Define the Transaction model
+class Transaction(db.Model):
+    __tablename__ = 't_transaction'
 
-    # Create an honjo customer if it doesn't exist
-    if not Customer.query.filter_by(customer_username='honjo').first():
-        hashed_pin = generate_password_hash('123456', method='pbkdf2:sha256')
-        new_customer = Customer(
-            customer_username='honjo',
-            customer_pin=hashed_pin,
-            customer_name='Admin Honjo'
-        )
-        db.session.add(new_customer)
-        db.session.commit()
+    id = db.Column(db.BigInteger, primary_key=True, nullable=False)
+    m_customer_id = db.Column(db.BigInteger, nullable=False)
+    transaction_type = db.Column(db.String(2), nullable=False, default='')
+    transaction_amount = db.Column(db.Numeric(30, 5), nullable=True)
+    transmission_date = db.Column(db.DateTime, nullable=True)
+    transaction_date = db.Column(db.DateTime, nullable=True)
+    value_date = db.Column(db.DateTime, nullable=True)
+    description = db.Column(db.String(250), nullable=True)
+    created = db.Column(db.DateTime, server_default=db.func.current_timestamp(), nullable=False)
+    updated = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp(), nullable=False)
 
-    return 'Database initialized!'
 
-# Login route
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    # Redirect to index if user is already logged in
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
 
-    if request.method == 'POST':
-        username = request.form.get('username')
-        pin = request.form.get('pin')
-        
-        customer = Customer.query.filter_by(customer_username=username).first()
-        
-        if customer and check_password_hash(customer.customer_pin, pin):
-            login_user(customer)
-            return redirect(url_for('index'))  # Redirect to the index page after login
-        else:
-            flash('Login failed. Check your username and PIN.')
 
-    return render_template('login.html')
+
 
 # Home route
 @app.route('/home')
 def home():
-    return render_template('index.html', customer=current_user)
-
-# Transfer route
-@app.route('/transfer', methods=['GET', 'POST'])
-def transfer():
-    if request.method == 'POST':
-        # Handle transfer logic here
-        # Example: Get transfer details from the form and process the transaction
-        recipient_username = request.form.get('recipient_username')
-        amount = request.form.get('amount')
-        # Add your transfer logic here
-        flash('Transfer successful!')
-        return redirect(url_for('home'))
-    
-    return render_template('transfer.html')
+    customer = Customer.query.first()
+    return render_template('index.html', customer=customer)
 
 # Saldo route
 @app.route('/saldo')
 def saldo():
-    # Add logic to retrieve and display the user's balance
-    return render_template('saldo.html', customer=current_user)
+    customer = Customer.query.first()
+    accounts = PortfolioAccount.query.filter_by(m_customer_id=customer.id).all()
+    transactions = Transaction.query.filter_by(m_customer_id=customer.id).all()
+    current_datetime = datetime.now(pytz.timezone('Asia/Jakarta'))
+    current_date = current_datetime.strftime('%d/%m/%Y')
+    current_time = current_datetime.strftime('%H:%M:%S')
+    return render_template('saldo.html', customer=customer, accounts=accounts, transactions=transactions, current_date=current_date, current_time=current_time)
+
+@app.route('/transfer')
+def transfer():
+    return render_template('transfer.html')
 
 @app.route('/input_saldo')
 def input_saldo():
-    # no_rekening = request.form['no_rekening']
-    # type_akun = request.form['type_akun']
-    # mata_uang = request.form['mata_uang']
-    # available_balance = request.form['available_balance']
-    
-    # You can process and save this data as needed
-    # For example, saving to a database
-
     return render_template('input_saldo.html')
-
-# Logout route
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
 
 # Index route
 @app.route('/')
 def index():
-    return render_template('index.html')
+    customer = Customer.query.first()
+    return render_template('index.html', customer=customer)
 
 # Run the app
 if __name__ == '__main__':
