@@ -94,8 +94,6 @@ def saldo():
     accounts = PortfolioAccount.query.filter_by(m_customer_id=customer.id).all()
     transactions = Transaction.query.filter_by(m_customer_id=customer.id).all()
     current_datetime = datetime.now(pytz.timezone('Asia/Jakarta'))
-    current_date = current_datetime.strftime('%d/%m/%Y')
-    current_time = current_datetime.strftime('%H:%M:%S')
     return render_template('saldo.html', customer=customer, accounts=accounts, transactions=transactions, current_date=current_date, current_time=current_time)
 
 @app.route('/transfer')
