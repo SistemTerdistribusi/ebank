@@ -4,9 +4,14 @@ Aplikasi perbankan sederhana yang dibangun dengan Flask, dirancang untuk mengelo
 
 ## Fitur
 
-- Input saldo dari sumber offline.
-- Antarmuka pengguna yang ramah untuk manajemen transaksi.
-- Desain responsif untuk berbagai perangkat.
+- [x] MVC
+- [x] Home terintegrasi dengan Database.
+- [x] Cek Saldo.
+- [x] Input saldo dari sumber offline.
+- [ ] Transaksi Internal.
+- [ ] Transaksi External(API).
+- [x] Desain responsif untuk berbagai perangkat.
+
 
 ## Teknologi yang Digunakan
 
