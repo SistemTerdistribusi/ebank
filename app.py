@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import pytz
+from decimal import Decimal
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -73,6 +74,7 @@ class Transaction(db.Model):
     transaction_date = db.Column(db.DateTime, nullable=True)
     value_date = db.Column(db.DateTime, nullable=True)
     description = db.Column(db.String(250), nullable=True)
+    status = db.Column(db.String(10), nullable=False, default='SUCCESS')
     created = db.Column(db.DateTime, server_default=db.func.current_timestamp(), nullable=False)
     updated = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp(), nullable=False)
 
@@ -93,16 +95,55 @@ def saldo():
     customer = Customer.query.first()
     accounts = PortfolioAccount.query.filter_by(m_customer_id=customer.id).all()
     transactions = Transaction.query.filter_by(m_customer_id=customer.id).all()
-    current_datetime = datetime.now(pytz.timezone('Asia/Jakarta'))
-    return render_template('saldo.html', customer=customer, accounts=accounts, transactions=transactions, current_date=current_date, current_time=current_time)
+    return render_template('saldo.html', customer=customer, accounts=accounts, transactions=transactions)
 
 @app.route('/transfer')
 def transfer():
     return render_template('transfer.html')
 
-@app.route('/input_saldo')
+@app.route('/input_saldo', methods=['GET', 'POST'])
 def input_saldo():
+    if request.method == 'POST':
+        account_number = request.form['account_number']
+        account_type = request.form['account_type']
+        currency_code = request.form['currency_code']
+        available_balance = request.form['available_balance']
+        
+        # Convert the input balance to a Decimal
+        available_balance_decimal = Decimal(available_balance)
+        
+        # Find the account by account number
+        account = PortfolioAccount.query.filter_by(account_number=account_number, account_type=account_type).first()
+        
+        if account:
+            # Ensure account available balance is Decimal and update it
+            account.available_balance = account.available_balance + available_balance_decimal
+
+            # Create a new transaction for the saldo input with status 'SUCCESS'
+            transaction = Transaction(
+                m_customer_id=account.m_customer_id,
+                transaction_type='CR',  # 'CR' for credit (incoming funds)
+                transaction_amount=available_balance_decimal,
+                transaction_date=datetime.now(pytz.timezone('Asia/Jakarta')),
+                description=f'Input saldo to account {account_number}',
+                status='SUCCESS'  # Set status to 'SUCCESS'
+            )
+
+            try:
+                db.session.add(transaction)  # Add the transaction to the session
+                db.session.commit()  # Commit both the balance update and the transaction
+
+                flash(f'Successfully added {available_balance} to account {account_number}', 'success')
+                return redirect(url_for('saldo'))  # Redirect to saldo view
+            except Exception as e:
+                db.session.rollback()  # Rollback in case of error
+                flash(f'Error: {str(e)}', 'danger')
+        else:
+            flash(f'Account not found with account number {account_number}', 'danger')
+
     return render_template('input_saldo.html')
+
+
 
 # Index route
 @app.route('/')
