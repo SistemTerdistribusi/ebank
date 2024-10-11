@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Bank{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='asset/klikbca.png') }}" type="image/png">
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div class="header-left">
-                <img src="{{ url_for('static', filename='/asset/bca logo.png') }}" alt="BCA Logo">
+                <img src="{{ url_for('static', filename='asset/banner.png') }}" alt="BCA Logo">
             </div>
             <div class="header-right">
                 <span>[LOGOUT]</span>
             </div>
         </div>
+        
 
         <div class="date-info">
             Date : {{ current_date }} Time : {{ current_time }}
