@@ -3,9 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import pytz
 from decimal import Decimal
+from flask_cors import CORS
 
-# Initialize Flask app
 app = Flask(__name__)
+CORS(app)  # This will allow all domains to access your API
 
 # Configure the app
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://ebanking:hexagon123@panel.honjo.web.id:3306/ebanking'
@@ -143,7 +144,71 @@ def input_saldo():
 
     return render_template('input_saldo.html')
 
+#API Model for Mobile Request
 
+# Route untuk mendapatkan saldo dalam bentuk JSON
+@app.route('/api/saldo', methods=['GET'])
+def api_saldo():
+    customer = Customer.query.first()
+    accounts = PortfolioAccount.query.filter_by(m_customer_id=customer.id).all()
+    transactions = Transaction.query.filter_by(m_customer_id=customer.id).all()
+
+    accounts_data = []
+    for account in accounts:
+        accounts_data.append({
+            'account_number': account.account_number,
+            'available_balance': float(account.available_balance),  # Convert Decimal to float
+            'account_name': account.account_name
+        })
+
+    transactions_data = []
+    for transaction in transactions:
+        transactions_data.append({
+            'transaction_type': transaction.transaction_type,
+            'transaction_amount': float(transaction.transaction_amount),
+            'description': transaction.description,
+            'transaction_date': transaction.transaction_date.strftime('%Y-%m-%d %H:%M:%S')
+        })
+
+    return jsonify({
+        'customer_name': customer.customer_name,
+        'accounts': accounts_data,
+        'transactions': transactions_data
+    })
+
+# Route untuk melakukan transfer
+@app.route('/api/transfer', methods=['POST'])
+def api_transfer():
+    data = request.get_json()
+    account_number = data['account_number']
+    amount = Decimal(data['amount'])
+
+    account = PortfolioAccount.query.filter_by(account_number=account_number).first()
+
+    if account and account.available_balance >= amount:
+        # Update balance
+        account.available_balance -= amount
+
+        # Create transaction
+        transaction = Transaction(
+            m_customer_id=account.m_customer_id,
+            transaction_type='DB',  # 'DB' for debit (outgoing funds)
+            transaction_amount=amount,
+            transaction_date=datetime.now(pytz.timezone('Asia/Jakarta')),
+            description=f'Transfer from account {account_number}',
+            status='SUCCESS'
+        )
+
+        try:
+            db.session.add(transaction)
+            db.session.commit()
+
+            return jsonify({'message': 'Transfer successful', 'status': 'SUCCESS'}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'message': f'Error: {str(e)}', 'status': 'FAILED'}), 500
+    else:
+        return jsonify({'message': 'Insufficient balance or account not found', 'status': 'FAILED'}), 400
 
 # Index route
 @app.route('/')
