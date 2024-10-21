@@ -210,6 +210,87 @@ def api_transfer():
     else:
         return jsonify({'message': 'Insufficient balance or account not found', 'status': 'FAILED'}), 400
 
+@app.route('/api/input_saldo', methods=['POST'])
+def api_input_saldo():
+    data = request.get_json()
+
+    # Validate and extract data from the request
+    account_number = data.get('account_number')
+    account_type = data.get('account_type')
+    currency_code = data.get('currency_code')
+    available_balance = data.get('available_balance')
+
+    if not all([account_number, account_type, currency_code, available_balance]):
+        return jsonify({
+            'status': 'FAILED',
+            'message': 'Missing required fields',
+            'errors': {
+                'account_number': 'required' if not account_number else None,
+                'account_type': 'required' if not account_type else None,
+                'currency_code': 'required' if not currency_code else None,
+                'available_balance': 'required' if not available_balance else None,
+            }
+        }), 400
+
+    # Convert the input balance to a Decimal
+    try:
+        available_balance_decimal = Decimal(available_balance)
+    except Exception as e:
+        return jsonify({
+            'status': 'FAILED',
+            'message': 'Invalid available_balance',
+            'errors': {
+                'available_balance': str(e)
+            }
+        }), 400
+
+    # Find the account by account number and account type
+    account = PortfolioAccount.query.filter_by(account_number=account_number, account_type=account_type).first()
+
+    if not account:
+        return jsonify({
+            'status': 'FAILED',
+            'message': f'Account not found with account number {account_number}',
+            'errors': {
+                'account_number': 'Account not found'
+            }
+        }), 404
+
+    # Ensure account available balance is Decimal and update it
+    account.available_balance = account.available_balance + available_balance_decimal
+
+    # Create a new transaction for the saldo input with status 'SUCCESS'
+    transaction = Transaction(
+        m_customer_id=account.m_customer_id,
+        transaction_type='CR',  # 'CR' for credit (incoming funds)
+        transaction_amount=available_balance_decimal,
+        transaction_date=datetime.now(pytz.timezone('Asia/Jakarta')),
+        description=f'Input saldo to account {account_number}',
+        status='SUCCESS'  # Set status to 'SUCCESS'
+    )
+
+    try:
+        db.session.add(transaction)  # Add the transaction to the session
+        db.session.commit()  # Commit both the balance update and the transaction
+
+        return jsonify({
+            'status': 'SUCCESS',
+            'message': f'Successfully added {available_balance} to account {account_number}',
+            'data': {
+                'account_number': account_number,
+                'new_balance': float(account.available_balance)  # Convert Decimal to float for JSON serialization
+            }
+        }), 200
+    except Exception as e:
+        db.session.rollback()  # Rollback in case of error
+        return jsonify({
+            'status': 'FAILED',
+            'message': 'Error processing the request',
+            'errors': {
+                'server': str(e)
+            }
+        }), 500
+
 # Index route
 @app.route('/')
 def index():
