@@ -5,4 +5,4 @@ flask-mysqldb==2.0.0
 mysqlclient>=2.2.0
 pymysql
 pytz==2023.3
-flask_cors-5.0.0
+flask_cors=5.0.0
