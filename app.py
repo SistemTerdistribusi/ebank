@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)  # This will allow all domains to access your API
 
 # Configure the app
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://ebanking:d5kATajLn8WA2GM2@panel.honjo.web.id:3306/ebanking'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://ebanking:hexagon123@panel.honjo.web.id:3306/ebanking'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'wibunyel'
 
