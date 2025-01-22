@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)  # This will allow all domains to access your API
 
 # Configure the app
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://ebanking:hexagon123@panel.honjo.web.id:3306/ebanking'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://ebanking:d5kATajLn8WA2GM2@panel.honjo.web.id:3306/ebanking'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'wibunyel'
 
@@ -180,38 +180,84 @@ def api_saldo():
 @app.route('/api/transfer', methods=['POST'])
 def api_transfer():
     data = request.get_json()
-    account_number = data['account_number']
+    
+    source_account_number = data['source_account_number']
+    destination_account_number = data['destination_account_number']
     amount = Decimal(data['amount'])
 
-    account = PortfolioAccount.query.filter_by(account_number=account_number).first()
+    # Retrieve the source account
+    source_account = PortfolioAccount.query.filter_by(account_number=source_account_number).first()
+    # Retrieve the destination account
+    destination_account = PortfolioAccount.query.filter_by(account_number=destination_account_number).first()
 
-    if account and account.available_balance >= amount:
-        # Update balance
-        account.available_balance -= amount
+    # Check if both accounts exist
+    if not source_account or not destination_account:
+        return jsonify({
+            'message': 'One or both accounts not found',
+            'status': 'FAILED'
+        }), 404
 
-        # Create transaction
-        transaction = Transaction(
-            m_customer_id=account.m_customer_id,
+    # Check if the source account has sufficient balance
+    if source_account.available_balance < amount:
+        return jsonify({
+            'message': 'Insufficient balance',
+            'status': 'FAILED'
+        }), 400
+
+    try:
+        # Deduct the amount from the source account
+        source_account.available_balance -= amount
+
+        # Add the amount to the destination account
+        destination_account.available_balance += amount
+
+        # Create the source account transaction (Debit)
+        transaction_from = Transaction(
+            m_customer_id=source_account.m_customer_id,
             transaction_type='DB',  # 'DB' for debit (outgoing funds)
             transaction_amount=amount,
             transaction_date=datetime.now(pytz.timezone('Asia/Jakarta')),
-            description=f'Transfer from account {account_number}',
+            description=f'Transfer to account {destination_account_number}',
+            status='SUCCESS'
+        )
+        
+        # Create the destination account transaction (Credit)
+        transaction_to = Transaction(
+            m_customer_id=destination_account.m_customer_id,
+            transaction_type='CR',  # 'CR' for credit (incoming funds)
+            transaction_amount=amount,
+            transaction_date=datetime.now(pytz.timezone('Asia/Jakarta')),
+            description=f'Transfer from account {source_account_number}',
             status='SUCCESS'
         )
 
-        try:
-            db.session.add(transaction)
-            db.session.commit()
+        # Add the transactions and account updates to the session
+        db.session.add(transaction_from)
+        db.session.add(transaction_to)
+        db.session.commit()
 
-            return jsonify({'message': 'Transfer successful', 'status': 'SUCCESS'}), 200
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'message': f'Error: {str(e)}', 'status': 'FAILED'}), 500
-    else:
-        return jsonify({'message': 'Insufficient balance or account not found', 'status': 'FAILED'}), 400
+        return jsonify({
+            'message': 'Transfer successful',
+            'status': 'SUCCESS'
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'message': f'Error: {str(e)}',
+            'status': 'FAILED'
+        }), 500
+
 
 @app.route('/api/input_saldo', methods=['POST'])
 def api_input_saldo():
+    # Ensure the content-type is application/json
+    if request.content_type != 'application/json':
+        return jsonify({
+            'status': 'FAILED',
+            'message': 'Content-Type must be application/json'
+        }), 415
+
+    # Get JSON data from the request
     data = request.get_json()
 
     # Validate and extract data from the request
@@ -290,6 +336,7 @@ def api_input_saldo():
                 'server': str(e)
             }
         }), 500
+
 
 # Index route
 @app.route('/')
